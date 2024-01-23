@@ -1,18 +1,17 @@
-#!/bin/bash
-
-# Update package list and install nginx
-apt-get update
-apt-get install -y nginx
-
-# Create a basic HTML file with the content "Hello World!"
-echo "Hello World!" > /var/www/html/index.html
-
-# Ensure nginx is listening on port 80
-sed -i 's/^\(\s*listen\s*\)80/\180/' /etc/nginx/sites-available/default
-
+#!/usr/bin/env bash
+# Update the package list
+# Install nginx with the "-y" flag to automatically confirm installation
+# Configure nginx to listen on port 80
+# Disable the default nginx welcome page
 # Restart nginx without using systemctl
-kill -HUP $(cat /var/run/nginx.pid)
+# Create a simple HTML file with the content "Hello World!"
+# Display success message
 
-# Display a success message
-echo "Nginx has been installed and configured successfully!"
+sudo apt-get update
+sudo apt-get install -y nginx
+sudo sed -i 's/listen 80 default_server;/listen 80;/g' /etc/nginx/sites-available/default
+sudo sed -i '/location \/ {/a \\treturn 404;' /etc/nginx/sites-available/default
+sudo /etc/init.d/nginx restart
+echo "<html><body><h1>Hello World!</h1></body></html>" | sudo tee /var/www/html/index.html > /dev/null
+echo "Nginx has been installed and configured. You can test it by running: curl http://localhost/"
 
